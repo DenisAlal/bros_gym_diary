@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "bro-s-gym-diary",
+          "appId": "1:980645117021:android:e8ccc070add1cee7caa1b4",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "bro-s-gym-diary",
+          "configurations": {
+            "android": "1:980645117021:android:e8ccc070add1cee7caa1b4",
+            "ios": "1:980645117021:ios:26e5a93c58329f84caa1b4"
+          }
+        }
+      }
+    }
+  }
+}

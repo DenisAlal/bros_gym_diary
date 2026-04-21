@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "980645117021",
+    "project_id": "bro-s-gym-diary",
+    "storage_bucket": "bro-s-gym-diary.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980645117021:android:e8ccc070add1cee7caa1b4",
+        "android_client_info": {
+          "package_name": "com.denAlal.bros_gym_diary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "980645117021-9rdn1j9vmbnplgcqa7d0f17haurtcm3j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.denAlal.bros_gym_diary",
+            "certificate_hash": "4585873e7c76c148bf90d29542f996979991cee3"
+          }
+        },
+        {
+          "client_id": "980645117021-p24oc4vfg0tgjn5f02fsn899f7efc6h3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.denAlal.bros_gym_diary",
+            "certificate_hash": "daf0e8d0f05dd291dc73d1cdee585cabae2c12cb"
+          }
+        },
+        {
+          "client_id": "980645117021-g4lc57ki9iaog6nrt9eh1ruuhajqqfcl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCVGlfpJg1FHOr7OD2xD4BCc4L44-9nUY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "980645117021-g4lc57ki9iaog6nrt9eh1ruuhajqqfcl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "980645117021-ag7ue43sobu3jvdgk0e639l7ambs1us5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.denAlal.brosGymDiary"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
