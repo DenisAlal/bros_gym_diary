@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/utils.dart';
 import '../../models/exercise.dart';
 import 'new_exercise.dart';
 import 'exercise_repository.dart';
@@ -113,56 +114,17 @@ class _ExerciseCard extends StatelessWidget {
     required this.onTap,
   });
 
-  IconData _iconForMuscle(String group) {
-    switch (group) {
-      case 'chest':
-        return Icons.fitness_center;
-      case 'back':
-        return Icons.accessibility_new;
-      case 'legs':
-        return Icons.directions_run;
-      default:
-        return Icons.fitness_center;
-    }
-  }
-
-  Color _colorForMuscle(String group) {
-    switch (group) {
-      case 'chest':
-        return Colors.redAccent;
-      case 'back':
-        return Colors.blueAccent;
-      case 'legs':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _label(String group) {
-    switch (group) {
-      case 'chest':
-        return 'Грудь';
-      case 'back':
-        return 'Спина';
-      case 'legs':
-        return 'Ноги';
-      default:
-        return group;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final color = _colorForMuscle(exercise.muscleGroup);
+    final color = colorForMuscle(exercise.muscleGroup);
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+          colors: [color.withAlpha(70), color.withAlpha(15)],
         ),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withAlpha(30)),
       ),
       child: ListTile(
         onTap: onTap,
@@ -172,8 +134,8 @@ class _ExerciseCard extends StatelessWidget {
         ),
 
         leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
-          child: Icon(_iconForMuscle(exercise.muscleGroup), color: color),
+          backgroundColor: color.withAlpha(55),
+          child: Icon(iconForMuscle(exercise.muscleGroup), color: color),
         ),
 
         title: Text(
@@ -182,7 +144,7 @@ class _ExerciseCard extends StatelessWidget {
         ),
 
         subtitle: Text(
-          '${_label(exercise.muscleGroup)} • ${exercise.weightStart}-${exercise.weightEnd} кг',
+          '${label(exercise.muscleGroup)} • ${exercise.weightStart}-${exercise.weightEnd} кг',
         ),
 
         trailing: Row(
@@ -205,41 +167,17 @@ class ExerciseDetailScreen extends StatelessWidget {
 
   const ExerciseDetailScreen({super.key, required this.exercise});
 
-  String _label(String group) {
-    switch (group) {
-      case 'chest':
-        return 'Грудь';
-      case 'back':
-        return 'Спина';
-      case 'legs':
-        return 'Ноги';
-      default:
-        return group;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(exercise.name)),
+      appBar: AppBar(title: Text('Упражнение')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (exercise.imageUrl.isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  exercise.imageUrl,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-
             const SizedBox(height: 16),
-
             Text(
               exercise.name,
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -247,16 +185,59 @@ class ExerciseDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            Text(
-              'Группа: ${_label(exercise.muscleGroup)}',
-              style: const TextStyle(fontSize: 16),
+            Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Тренажер: ',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: exercise.simulatorName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Группа: ',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: label(exercise.muscleGroup),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 8),
-
-            Text(
-              'Вес: ${exercise.weightStart} - ${exercise.weightEnd} кг',
-              style: const TextStyle(fontSize: 16),
+            Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Вес: ',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: '${exercise.weightStart} - ${exercise.weightEnd} кг',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

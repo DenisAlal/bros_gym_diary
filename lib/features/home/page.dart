@@ -25,9 +25,8 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 12,
           children: [
             _tile(context, 'Упражнения', Icons.fitness_center, '/exercises'),
-            _tile(context, 'История тренировок', Icons.calendar_month, '/training_history'),
+            _tile(context, 'Тренировки', Icons.calendar_month, '/training'),
             _tile(context, 'Шаблоны тренировок', Icons.list_alt, '/training_patterns'),
-            _tile(context, 'Новая тренировка', Icons.play_arrow, '/new_workout'),
           ],
         ),
       ),
