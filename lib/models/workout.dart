@@ -2,11 +2,13 @@ class WorkoutTemplate {
   final String id;
   final String name;
   final List<String> exerciseIds;
+  final Map<String, int> defaultWeights;
 
   WorkoutTemplate({
     required this.id,
     required this.name,
     required this.exerciseIds,
+    this.defaultWeights = const {},
   });
 
   factory WorkoutTemplate.fromJson(Map<String, dynamic> json, String id) {
@@ -14,12 +16,14 @@ class WorkoutTemplate {
       id: id,
       name: json['name'],
       exerciseIds: List<String>.from(json['exerciseIds'] ?? []),
+      defaultWeights: Map<String, int>.from(json['defaultWeights'] ?? {}),
     );
   }
 
   Map<String, dynamic> toJson() => {
     'name': name,
     'exerciseIds': exerciseIds,
+    'defaultWeights': defaultWeights,
   };
 }
 
@@ -29,6 +33,7 @@ class Workout {
   final String templateId;
   final DateTime createdAtUtc;
   final List<WorkoutExerciseState> exercises;
+  final bool isCompleted;
 
   Workout({
     required this.id,
@@ -36,6 +41,7 @@ class Workout {
     required this.templateId,
     required this.createdAtUtc,
     required this.exercises,
+    this.isCompleted = false,
   });
 
   factory Workout.fromJson(Map<String, dynamic> json, String id) {
@@ -47,6 +53,7 @@ class Workout {
       exercises: (json['exercises'] as List<dynamic>? ?? [])
           .map((e) => WorkoutExerciseState.fromJson(e))
           .toList(),
+      isCompleted: json['isCompleted'] ?? false,
     );
   }
 
@@ -55,27 +62,55 @@ class Workout {
     'templateId': templateId,
     'createdAtUtc': createdAtUtc.toIso8601String(),
     'exercises': exercises.map((e) => e.toJson()).toList(),
+    'isCompleted': isCompleted,
   };
 }
 
 class WorkoutExerciseState {
   final String exerciseId;
   final bool done;
+  final int? weight;
+  final int? reps;
+  final int? sets;
 
   WorkoutExerciseState({
     required this.exerciseId,
     required this.done,
+    this.weight,
+    this.reps,
+    this.sets,
   });
 
   factory WorkoutExerciseState.fromJson(Map<String, dynamic> json) {
     return WorkoutExerciseState(
       exerciseId: json['exerciseId'],
       done: json['done'] ?? false,
+      weight: json['weight'],
+      reps: json['reps'],
+      sets: json['sets'],
     );
   }
 
   Map<String, dynamic> toJson() => {
     'exerciseId': exerciseId,
     'done': done,
+    'weight': weight,
+    'reps': reps,
+    'sets': sets,
   };
+
+  WorkoutExerciseState copyWith({
+    bool? done,
+    int? weight,
+    int? reps,
+    int? sets,
+  }) {
+    return WorkoutExerciseState(
+      exerciseId: exerciseId,
+      done: done ?? this.done,
+      weight: weight ?? this.weight,
+      reps: reps ?? this.reps,
+      sets: sets ?? this.sets,
+    );
+  }
 }

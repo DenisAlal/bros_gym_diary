@@ -2,16 +2,14 @@ class Exercise {
   final String id;
   final String name;
   final String simulatorName;
-  final int weightStart;
-  final int weightEnd;
+  final String description;
   final String muscleGroup;
 
   Exercise({
     required this.id,
     required this.name,
     required this.simulatorName,
-    required this.weightStart,
-    required this.weightEnd,
+    required this.description,
     required this.muscleGroup,
   });
 
@@ -20,8 +18,7 @@ class Exercise {
       id: id,
       name: json['name'],
       simulatorName: json['simulatorName'],
-      weightStart: json['weightStart'],
-      weightEnd: json['weightEnd'],
+      description: json['description'],
       muscleGroup: json['muscleGroup'],
     );
   }
@@ -29,8 +26,7 @@ class Exercise {
   Map<String, dynamic> toJson() => {
     'name': name,
     'simulatorName': simulatorName,
-    'weightStart': weightStart,
-    'weightEnd': weightEnd,
+    'description': description,
     'muscleGroup': muscleGroup,
   };
 }

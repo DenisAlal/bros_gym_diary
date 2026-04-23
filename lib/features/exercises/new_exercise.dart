@@ -18,8 +18,7 @@ class _ExerciseNewScreenState extends State<ExerciseNewScreen> {
 
   final nameController = TextEditingController();
   final simulatorNameController = TextEditingController();
-  final weightStartController = TextEditingController();
-  final weightEndController = TextEditingController();
+  final descriptionController = TextEditingController();
 
   String muscleGroup = 'chest';
 
@@ -33,8 +32,7 @@ class _ExerciseNewScreenState extends State<ExerciseNewScreen> {
     if (e != null) {
       nameController.text = e.name;
       simulatorNameController.text = e.simulatorName;
-      weightStartController.text = e.weightStart.toString();
-      weightEndController.text = e.weightEnd.toString();
+      descriptionController.text = e.description.toString();
       muscleGroup = e.muscleGroup;
     }
   }
@@ -54,8 +52,7 @@ class _ExerciseNewScreenState extends State<ExerciseNewScreen> {
                 id: widget.exercise?.id ?? '',
                 name: nameController.text,
                 simulatorName: simulatorNameController.text,
-                weightStart: int.tryParse(weightStartController.text) ?? 0,
-                weightEnd: int.tryParse(weightEndController.text) ?? 0,
+                description: descriptionController.text,
                 muscleGroup: muscleGroup,
               );
 
@@ -80,34 +77,42 @@ class _ExerciseNewScreenState extends State<ExerciseNewScreen> {
             children: [
               TextFormField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Название', border: OutlineInputBorder(),),
+                decoration: const InputDecoration(
+                  labelText: 'Название',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (v) => v!.isEmpty ? 'Введите название' : null,
               ),
               TextFormField(
                 controller: simulatorNameController,
-                decoration: const InputDecoration(labelText: 'Название тренажера', border: OutlineInputBorder(),),
-                validator: (v) => v!.isEmpty ? 'Введите название тренажера' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Название тренажера',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (v) =>
+                    v!.isEmpty ? 'Введите название тренажера' : null,
               ),
-
-              TextFormField(
-                controller: weightStartController,
-                decoration: const InputDecoration(labelText: 'Начальный вес', border: OutlineInputBorder(),),
-                keyboardType: TextInputType.number,
-              ),
-
-              TextFormField(
-                controller: weightEndController,
-                decoration: const InputDecoration(labelText: 'Конечный вес', border: OutlineInputBorder(),),
-                keyboardType: TextInputType.number,
-              ),
-
               DropdownButtonFormField<String>(
                 initialValue: muscleGroup,
                 items: muscleGroups.map((m) {
                   return DropdownMenuItem(value: m.id, child: Text(m.label));
                 }).toList(),
                 onChanged: (v) => setState(() => muscleGroup = v!),
-                decoration: const InputDecoration(labelText: 'Группа', border: OutlineInputBorder(),),
+                decoration: const InputDecoration(
+                  labelText: 'Группа',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              TextFormField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Описание',
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.multiline,
+                minLines: 3,
+                maxLines: null,
               ),
 
               const SizedBox(height: 20),

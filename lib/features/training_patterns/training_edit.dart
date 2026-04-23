@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../core/utils.dart';
 import '../../models/exercise.dart';
 import '../../models/workout.dart';
+import '../../shared/widgets/stepper.dart';
 import '../exercises/exercise_repository.dart';
 import '../exercises/page.dart';
 
@@ -25,7 +26,7 @@ class _WorkoutTemplateEditScreenState extends State<WorkoutTemplateEditScreen> {
 
   final exerciseRepo = ExerciseRepository();
   final templateRepo = WorkoutTemplateRepository();
-
+  Map<String, int> defaultWeights = {};
   @override
   void initState() {
     super.initState();
@@ -34,6 +35,7 @@ class _WorkoutTemplateEditScreenState extends State<WorkoutTemplateEditScreen> {
     if (t != null) {
       nameController.text = t.name;
       selected = List.from(t.exerciseIds);
+      defaultWeights = Map.from(t.defaultWeights);
     }
   }
 
@@ -45,8 +47,7 @@ class _WorkoutTemplateEditScreenState extends State<WorkoutTemplateEditScreen> {
             orElse: () => Exercise(
               id: '',
               name: 'Удалено',
-              weightStart: 0,
-              weightEnd: 0,
+              description: '',
               muscleGroup: '',
               simulatorName: '',
             ),
@@ -76,6 +77,7 @@ class _WorkoutTemplateEditScreenState extends State<WorkoutTemplateEditScreen> {
                 id: widget.template?.id ?? '',
                 name: nameController.text,
                 exerciseIds: selected,
+                defaultWeights: defaultWeights,
               );
 
               if (widget.template == null) {
@@ -150,7 +152,12 @@ class _WorkoutTemplateEditScreenState extends State<WorkoutTemplateEditScreen> {
                           ),
                         );
                       },
-
+                      onWeightChanged: (w) {
+                        setState(() {
+                          defaultWeights[e.id] = w;
+                        });
+                      },
+                      weight: defaultWeights[e.id],
                       onToggle: (v) {
                         setState(() {
                           if (v == true) {
@@ -181,6 +188,8 @@ class _ExerciseCard extends StatelessWidget {
   final bool isSelected;
   final bool isDraggable;
   final ValueChanged<bool?> onToggle;
+  final int? weight;
+  final ValueChanged<int>? onWeightChanged;
 
   const _ExerciseCard({
     required Key key,
@@ -189,6 +198,8 @@ class _ExerciseCard extends StatelessWidget {
     required this.isSelected,
     required this.onToggle,
     required this.isDraggable,
+    this.weight,
+    this.onWeightChanged,
   }) : super(key: key);
 
   @override
@@ -233,12 +244,23 @@ class _ExerciseCard extends StatelessWidget {
         ),
 
         subtitle: Text(
-          '${label(exercise.muscleGroup)} • ${exercise.weightStart}-${exercise.weightEnd} кг',
+          label(exercise.muscleGroup),
         ),
 
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [Checkbox(value: isSelected, onChanged: onToggle)],
+          children: [
+            if (isSelected)
+              WeightStepper(
+                value: weight ?? 20,
+                onChanged: (v) {
+                  if (onWeightChanged != null) {
+                    onWeightChanged!(v);
+                  }
+                },
+              ),
+            Checkbox(value: isSelected, onChanged: onToggle),
+          ],
         ),
       ),
     );

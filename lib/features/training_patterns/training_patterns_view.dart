@@ -29,9 +29,9 @@ class WorkoutTemplateViewScreen extends StatelessWidget {
                   orElse: () => Exercise(
                     id: '',
                     name: 'Удалено',
-                    weightStart: 0,
-                    weightEnd: 0,
-                    muscleGroup: '', simulatorName: '',
+                    description: '',
+                    muscleGroup: '',
+                    simulatorName: '',
                   ),
                 ),
               )
@@ -90,17 +90,16 @@ class ExerciseViewCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [
-            muscle.color.withAlpha(70),
-            muscle.color.withAlpha(15),
-          ],
+          colors: [muscle.color.withAlpha(70), muscle.color.withAlpha(15)],
         ),
         border: Border.all(color: muscle.color.withAlpha(30)),
       ),
       child: ListTile(
         onTap: onTap,
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
 
         leading: Stack(
           clipBehavior: Clip.none,
@@ -157,7 +156,17 @@ class ExerciseViewCard extends StatelessWidget {
                 ],
               ),
             ),
-
+            Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(
+                    text: 'Описание: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(text: exercise.description),
+                ],
+              ),
+            ),
             Text.rich(
               TextSpan(
                 children: [
@@ -166,21 +175,6 @@ class ExerciseViewCard extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   TextSpan(text: muscle.label),
-                ],
-              ),
-            ),
-
-            Text.rich(
-              TextSpan(
-                children: [
-                  const TextSpan(
-                    text: 'Вес: ',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(
-                    text:
-                    '${exercise.weightStart}-${exercise.weightEnd} кг',
-                  ),
                 ],
               ),
             ),

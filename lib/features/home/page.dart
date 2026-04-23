@@ -9,13 +9,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gym Diary'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-            },
-          )
-        ],
+        actions: [IconButton(icon: const Icon(Icons.person), onPressed: () {})],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -26,23 +20,33 @@ class HomeScreen extends StatelessWidget {
           children: [
             _tile(context, 'Упражнения', Icons.fitness_center, '/exercises'),
             _tile(context, 'Тренировки', Icons.calendar_month, '/training'),
-            _tile(context, 'Шаблоны тренировок', Icons.list_alt, '/training_patterns'),
+            _tile(
+              context,
+              'Шаблоны тренировок',
+              Icons.list_alt,
+              '/training_patterns',
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _tile(BuildContext context, String title, IconData icon, String route) {
+  Widget _tile(
+    BuildContext context,
+    String title,
+    IconData icon,
+    String route,
+  ) {
     return InkWell(
       onTap: () => context.push(route),
       child: Card(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: .center,
           children: [
             Icon(icon, size: 40),
             const SizedBox(height: 10),
-            Text(title),
+            Text(title, textAlign: .center),
           ],
         ),
       ),

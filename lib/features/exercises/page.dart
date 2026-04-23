@@ -144,7 +144,7 @@ class _ExerciseCard extends StatelessWidget {
         ),
 
         subtitle: Text(
-          '${label(exercise.muscleGroup)} • ${exercise.weightStart}-${exercise.weightEnd} кг',
+          label(exercise.muscleGroup),
         ),
 
         trailing: Row(
@@ -226,11 +226,11 @@ class ExerciseDetailScreen extends StatelessWidget {
               TextSpan(
                 children: [
                   const TextSpan(
-                    text: 'Вес: ',
+                    text: 'Описание: ',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
-                    text: '${exercise.weightStart} - ${exercise.weightEnd} кг',
+                    text: exercise.description,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.normal,

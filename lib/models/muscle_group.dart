@@ -28,15 +28,27 @@ const muscleGroups = [
     color: Colors.blueAccent,
   ),
   MuscleGroup(
-    id: 'back',
+    id: 'fullbody',
     label: 'Фулл Боди',
     icon: Icons.sports_martial_arts,
-    color: Colors.blueAccent,
+    color: Colors.deepPurpleAccent,
   ),
   MuscleGroup(
     id: 'legs',
     label: 'Ноги',
     icon: Icons.directions_run,
-    color: Colors.green,
+    color: Colors.greenAccent,
+  ),
+  MuscleGroup(
+    id: 'cardio',
+    label: 'Кардио',
+    icon: Icons.run_circle_outlined,
+    color: Colors.deepOrangeAccent,
+  ),
+  MuscleGroup(
+    id: 'hands',
+    label: 'Руки',
+    icon: Icons.sports_handball,
+    color: Colors.indigoAccent,
   ),
 ];

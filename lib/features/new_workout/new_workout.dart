@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/utils.dart';
 import '../../models/workout.dart';
 import '../../models/exercise.dart';
+import '../../shared/widgets/stepper.dart';
 import '../exercises/page.dart';
 import '../training_patterns/training_repository.dart';
 import '../exercises/exercise_repository.dart';
@@ -22,7 +23,7 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
   final workoutRepo = WorkoutRepository();
 
   String? selectedTemplateId;
-
+  Map<String, int> weightMap = {};
   Map<String, bool> doneMap = {};
   List<String> _orderedIds = [];
   final TextEditingController _nameController = TextEditingController();
@@ -52,6 +53,7 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                         return WorkoutExerciseState(
                           exerciseId: id,
                           done: doneMap[id] ?? false,
+                          weight: weightMap[id],
                         );
                       }).toList(),
                     );
@@ -90,6 +92,7 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                         selectedTemplateId = id;
 
                         doneMap = {for (final ex in t.exerciseIds) ex: false};
+                        weightMap = Map.from(t.defaultWeights); // NEW
 
                         _orderedIds = List<String>.from(t.exerciseIds);
                       });
@@ -152,6 +155,12 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                                   ),
                                 );
                               },
+                              weight: weightMap[e.id],
+                              onWeightChanged: (w) {
+                                setState(() {
+                                  weightMap[e.id] = w;
+                                });
+                              },
                             );
                           },
                         );
@@ -169,11 +178,15 @@ class _ExerciseCard extends StatelessWidget {
   final Exercise exercise;
   final VoidCallback onTap;
   final bool isDraggable;
+  final int? weight;
+  final ValueChanged<int>? onWeightChanged;
 
   const _ExerciseCard({
     super.key,
     required this.exercise,
     required this.onTap,
+    required this.onWeightChanged,
+    required this.weight,
     this.isDraggable = false,
   });
 
@@ -210,8 +223,17 @@ class _ExerciseCard extends StatelessWidget {
           exercise.name,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: Text(
-          '${label(exercise.muscleGroup)} • ${exercise.weightStart}-${exercise.weightEnd} кг',
+        subtitle: Text(label(exercise.muscleGroup)),
+        trailing: SizedBox(
+          width: 100,
+          child:  WeightStepper(
+            value: weight ?? 20,
+            onChanged: (v) {
+              if (onWeightChanged != null) {
+                onWeightChanged!(v);
+              }
+            },
+          ),
         ),
       ),
     );

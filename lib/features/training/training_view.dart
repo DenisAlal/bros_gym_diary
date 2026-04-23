@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../core/utils.dart';
 import '../../models/workout.dart';
 import '../../models/exercise.dart';
+import '../../shared/widgets/stepper.dart';
 import '../exercises/exercise_repository.dart';
 import '../exercises/page.dart';
 import '../new_workout/workout_repository.dart';
@@ -22,14 +23,20 @@ class TrainingHistoryViewScreen extends StatefulWidget {
 class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
   final exerciseRepo = ExerciseRepository();
   final workoutRepo = WorkoutRepository();
-
+  late bool isCompleted;
   late Map<String, bool> doneMap;
+  Map<String, int> weightMap = {};
 
   @override
   void initState() {
     super.initState();
 
     doneMap = {for (final e in widget.workout.exercises) e.exerciseId: e.done};
+    weightMap = {
+      for (final e in widget.workout.exercises) e.exerciseId: e.weight ?? 0,
+    };
+
+    isCompleted = widget.workout.isCompleted;
   }
 
   Future<void> _saveInstant(String userId) async {
@@ -38,9 +45,14 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
       templateId: widget.workout.templateId,
       createdAtUtc: widget.workout.createdAtUtc,
       name: widget.workout.name,
-      exercises: doneMap.entries
-          .map((e) => WorkoutExerciseState(exerciseId: e.key, done: e.value))
-          .toList(),
+      isCompleted: isCompleted,
+      exercises: doneMap.entries.map((e) {
+        return WorkoutExerciseState(
+          exerciseId: e.key,
+          done: e.value,
+          weight: weightMap[e.key],
+        );
+      }).toList(),
     );
 
     await workoutRepo.update(userId, updated);
@@ -66,8 +78,7 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
                     id: '',
                     name: 'Удалено',
                     simulatorName: '',
-                    weightStart: 0,
-                    weightEnd: 0,
+                    description: '',
                     muscleGroup: '',
                   ),
                 ),
@@ -115,7 +126,26 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
                         fontSize: 14,
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: isCompleted,
+                            onChanged: (v) async {
+                              setState(() {
+                                isCompleted = v ?? false;
+                              });
+
+                              await _saveInstant(userId);
+                            },
+                          ),
+                          const Text('Завершить тренировку'),
+                        ],
+                      ),
+                    ),
                   ],
+
                 ),
               ),
 
@@ -128,6 +158,17 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
                     return _ExerciseCard(
                       key: ValueKey(e.id),
                       exercise: e,
+                      isLocked: isCompleted,
+                      weight: weightMap[e.id] ?? 0,
+                      onWeightChanged: (w) async {
+                        setState(() {
+                          weightMap[e.id] = w;
+                        });
+
+                        if (!isCompleted) {
+                          await _saveInstant(userId);
+                        }
+                      },
                       isSelected: doneMap[e.id] ?? false,
                       onToggle: (v) async {
                         setState(() {
@@ -159,16 +200,20 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
 class _ExerciseCard extends StatelessWidget {
   final Exercise exercise;
   final VoidCallback onTap;
-
+  final int weight;
+  final ValueChanged<int> onWeightChanged;
   final bool isSelected;
   final ValueChanged<bool?> onToggle;
-
+  final bool isLocked;
   const _ExerciseCard({
     required Key key,
     required this.exercise,
     required this.onTap,
+    required this.isLocked,
     required this.isSelected,
     required this.onToggle,
+    required this.weight,
+    required this.onWeightChanged,
   }) : super(key: key);
 
   @override
@@ -206,13 +251,26 @@ class _ExerciseCard extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
 
-        subtitle: Text(
-          '${label(exercise.muscleGroup)} • ${exercise.weightStart}-${exercise.weightEnd} кг',
-        ),
+        subtitle: Text(label(exercise.muscleGroup)),
 
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [Checkbox(value: isSelected, onChanged: onToggle)],
+          children: [
+            if (!isLocked)
+              WeightStepper(
+                value: weight,
+                onChanged: onWeightChanged,
+              )
+            else
+              Text('$weight кг'),
+
+            const SizedBox(width: 8),
+
+            Checkbox(
+              value: isSelected,
+              onChanged: isLocked ? null : onToggle,
+            ),
+          ],
         ),
       ),
     );
