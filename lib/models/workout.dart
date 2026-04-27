@@ -2,7 +2,7 @@ class WorkoutTemplate {
   final String id;
   final String name;
   final List<String> exerciseIds;
-  final Map<String, int> defaultWeights;
+  final Map<String, double> defaultWeights;
 
   WorkoutTemplate({
     required this.id,
@@ -16,7 +16,7 @@ class WorkoutTemplate {
       id: id,
       name: json['name'],
       exerciseIds: List<String>.from(json['exerciseIds'] ?? []),
-      defaultWeights: Map<String, int>.from(json['defaultWeights'] ?? {}),
+      defaultWeights: Map<String, double>.from(json['defaultWeights'] ?? {}),
     );
   }
 
@@ -69,7 +69,7 @@ class Workout {
 class WorkoutExerciseState {
   final String exerciseId;
   final bool done;
-  final int? weight;
+  final double? weight;
   final int? reps;
   final int? sets;
 
@@ -101,7 +101,7 @@ class WorkoutExerciseState {
 
   WorkoutExerciseState copyWith({
     bool? done,
-    int? weight,
+    double? weight,
     int? reps,
     int? sets,
   }) {

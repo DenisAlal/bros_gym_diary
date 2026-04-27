@@ -23,8 +23,8 @@ class WorkoutRepository {
     await _ref(userId).add(workout.toJson());
   }
 
-  Future<void> update(String userId, Workout workout) async {
-    await _ref(userId).doc(workout.id).update(workout.toJson());
+  Future<void> update(String userId, String id, Workout workout) async {
+    await _ref(userId).doc(id).update(workout.toJson());
   }
 
   Future<void> delete(String userId, String id) async {

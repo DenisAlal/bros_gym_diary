@@ -5,6 +5,7 @@ import '../../features/auth/page.dart';
 import '../../features/exercises/page.dart';
 import '../../features/home/page.dart';
 import '../../features/new_workout/new_workout.dart';
+import '../../features/stat/exercises_stat.dart';
 import '../../features/training/training.dart';
 import '../../features/training_patterns/training_patterns.dart';
 import '../firebase/signin.dart';
@@ -28,6 +29,7 @@ final router = GoRouter(
     GoRoute(path: '/exercises', builder: (_, _) => ExerciseListScreen()),
     GoRoute(path: '/training', builder: (_, _) => TrainingScreen()),
     GoRoute(path: '/new_workout', builder: (_, _) => NewWorkoutScreen()),
+    GoRoute(path: '/stat', builder: (_, _) => ExerciseStatsScreen()),
     GoRoute(
       path: '/training_patterns',
       builder: (_, _) => WorkoutTemplateListScreen(),

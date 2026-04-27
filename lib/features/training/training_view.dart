@@ -25,7 +25,7 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
   final workoutRepo = WorkoutRepository();
   late bool isCompleted;
   late Map<String, bool> doneMap;
-  Map<String, int> weightMap = {};
+  Map<String, double> weightMap = {};
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
       }).toList(),
     );
 
-    await workoutRepo.update(userId, updated);
+    await workoutRepo.update(userId, widget.workout.id, updated);
   }
 
   @override
@@ -145,7 +145,6 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
                       ),
                     ),
                   ],
-
                 ),
               ),
 
@@ -159,7 +158,7 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
                       key: ValueKey(e.id),
                       exercise: e,
                       isLocked: isCompleted,
-                      weight: weightMap[e.id] ?? 0,
+                      weight: weightMap[e.id] ?? 0.0,
                       onWeightChanged: (w) async {
                         setState(() {
                           weightMap[e.id] = w;
@@ -200,11 +199,12 @@ class _TrainingHistoryViewScreenState extends State<TrainingHistoryViewScreen> {
 class _ExerciseCard extends StatelessWidget {
   final Exercise exercise;
   final VoidCallback onTap;
-  final int weight;
-  final ValueChanged<int> onWeightChanged;
+  final double weight;
+  final ValueChanged<double> onWeightChanged;
   final bool isSelected;
   final ValueChanged<bool?> onToggle;
   final bool isLocked;
+
   const _ExerciseCard({
     required Key key,
     required this.exercise,
@@ -257,19 +257,17 @@ class _ExerciseCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!isLocked)
-              WeightStepper(
-                value: weight,
-                onChanged: onWeightChanged,
-              )
+              WeightInput(value: weight, onChanged: onWeightChanged)
             else
               Text('$weight кг'),
 
             const SizedBox(width: 8),
 
-            Checkbox(
-              value: isSelected,
-              onChanged: isLocked ? null : onToggle,
-            ),
+            if (!isLocked)
+              Checkbox(
+                value: isSelected,
+                onChanged: isLocked ? null : onToggle,
+              ),
           ],
         ),
       ),

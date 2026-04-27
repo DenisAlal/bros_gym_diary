@@ -26,7 +26,7 @@ class _WorkoutTemplateEditScreenState extends State<WorkoutTemplateEditScreen> {
 
   final exerciseRepo = ExerciseRepository();
   final templateRepo = WorkoutTemplateRepository();
-  Map<String, int> defaultWeights = {};
+  Map<String, double> defaultWeights = {};
   @override
   void initState() {
     super.initState();
@@ -188,8 +188,8 @@ class _ExerciseCard extends StatelessWidget {
   final bool isSelected;
   final bool isDraggable;
   final ValueChanged<bool?> onToggle;
-  final int? weight;
-  final ValueChanged<int>? onWeightChanged;
+  final double? weight;
+  final ValueChanged<double>? onWeightChanged;
 
   const _ExerciseCard({
     required Key key,
@@ -251,7 +251,7 @@ class _ExerciseCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected)
-              WeightStepper(
+              WeightInput(
                 value: weight ?? 20,
                 onChanged: (v) {
                   if (onWeightChanged != null) {

@@ -1,3 +1,4 @@
+import 'package:bros_gym_diary/features/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +10,17 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gym Diary'),
-        actions: [IconButton(icon: const Icon(Icons.person), onPressed: () {})],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ProfileScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -23,8 +34,14 @@ class HomeScreen extends StatelessWidget {
             _tile(
               context,
               'Шаблоны тренировок',
-              Icons.list_alt,
+              Icons.library_books_sharp,
               '/training_patterns',
+            ),
+            _tile(
+              context,
+              'Статистика',
+              Icons.auto_graph,
+              '/stat',
             ),
           ],
         ),
@@ -44,7 +61,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: .center,
           children: [
-            Icon(icon, size: 40),
+            Icon(icon, size: 60),
             const SizedBox(height: 10),
             Text(title, textAlign: .center),
           ],

@@ -11,7 +11,10 @@ import '../training_patterns/training_repository.dart';
 import '../exercises/exercise_repository.dart';
 
 class NewWorkoutScreen extends StatefulWidget {
-  const NewWorkoutScreen({super.key});
+  final Workout? workout;
+  final DateTime? date;
+
+  const NewWorkoutScreen({super.key, this.workout, this.date});
 
   @override
   State<NewWorkoutScreen> createState() => _NewWorkoutScreenState();
@@ -21,13 +24,43 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
   final templateRepo = WorkoutTemplateRepository();
   final exerciseRepo = ExerciseRepository();
   final workoutRepo = WorkoutRepository();
-
+  DateTime _selectedDate = DateTime.now();
   String? selectedTemplateId;
-  Map<String, int> weightMap = {};
+  Map<String, double> weightMap = {};
   Map<String, bool> doneMap = {};
   List<String> _orderedIds = [];
   final TextEditingController _nameController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+
+    final w = widget.workout;
+    if (w != null) {
+      selectedTemplateId = w.templateId;
+      _nameController.text = w.name;
+
+      _orderedIds = w.exercises.map((e) => e.exerciseId).toList();
+      _selectedDate = w.createdAtUtc.toLocal();
+      doneMap = {for (final e in w.exercises) e.exerciseId: e.done};
+
+      weightMap = {
+        for (final e in w.exercises)
+          if (e.weight != null) e.exerciseId: e.weight!,
+      };
+    }
+    if (widget.workout != null) {
+      _selectedDate = widget.workout!.createdAtUtc.toLocal();
+    }
+    if(widget.date != null){
+      _selectedDate = widget.date!;
+    }
+  }
+  String formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}.'
+        '${date.month.toString().padLeft(2, '0')}.'
+        '${date.year}';
+  }
   @override
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser!.uid;
@@ -48,7 +81,7 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                           ? 'Тренировка'
                           : _nameController.text.trim(),
                       templateId: selectedTemplateId!,
-                      createdAtUtc: DateTime.now().toUtc(),
+                      createdAtUtc: _selectedDate.toUtc(),
                       exercises: _orderedIds.map((id) {
                         return WorkoutExerciseState(
                           exerciseId: id,
@@ -58,7 +91,15 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                       }).toList(),
                     );
 
-                    await workoutRepo.add(userId, workout);
+                    if (widget.workout != null) {
+                      await workoutRepo.update(
+                        userId,
+                        widget.workout!.id,
+                        workout,
+                      );
+                    } else {
+                      await workoutRepo.add(userId, workout);
+                    }
 
                     if (context.mounted) {
                       Navigator.pop(context, true);
@@ -72,7 +113,7 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(15),
               child: StreamBuilder<List<WorkoutTemplate>>(
                 stream: templateRepo.watchTemplates(userId),
                 builder: (context, snapshot) {
@@ -91,10 +132,29 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                       setState(() {
                         selectedTemplateId = id;
 
-                        doneMap = {for (final ex in t.exerciseIds) ex: false};
-                        weightMap = Map.from(t.defaultWeights); // NEW
+                        final newOrdered = List<String>.from(t.exerciseIds);
 
-                        _orderedIds = List<String>.from(t.exerciseIds);
+                        final newDoneMap = <String, bool>{};
+                        final newWeightMap = <String, double>{};
+
+                        for (final exId in newOrdered) {
+                          if (doneMap.containsKey(exId)) {
+                            newDoneMap[exId] = doneMap[exId]!;
+                            if (weightMap.containsKey(exId)) {
+                              newWeightMap[exId] = weightMap[exId]!;
+                            }
+                          } else {
+                            newDoneMap[exId] = false;
+
+                            if (t.defaultWeights.containsKey(exId)) {
+                              newWeightMap[exId] = t.defaultWeights[exId]!;
+                            }
+                          }
+                        }
+
+                        _orderedIds = newOrdered;
+                        doneMap = newDoneMap;
+                        weightMap = newWeightMap;
                       });
                     },
                   );
@@ -110,6 +170,42 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Название тренировки',
                   border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: InkWell(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _selectedDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2100),
+                  );
+
+                  if (picked != null) {
+                    setState(() {
+                      _selectedDate = DateTime(
+                        picked.year,
+                        picked.month,
+                        picked.day,
+                        _selectedDate.hour,
+                        _selectedDate.minute,
+                      );
+                    });
+                  }
+                },
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Дата тренировки',
+                    border: OutlineInputBorder(),
+                  ),
+                  child: Text(
+                    formatDate(_selectedDate),
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
             ),
@@ -146,6 +242,13 @@ class _NewWorkoutScreenState extends State<NewWorkoutScreen> {
                               key: ValueKey(e.id),
                               exercise: e,
                               isDraggable: true,
+                              onDelete: () {
+                                setState(() {
+                                  _orderedIds.remove(e.id);
+                                  weightMap.remove(e.id);
+                                  doneMap.remove(e.id);
+                                });
+                              },
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -178,14 +281,16 @@ class _ExerciseCard extends StatelessWidget {
   final Exercise exercise;
   final VoidCallback onTap;
   final bool isDraggable;
-  final int? weight;
-  final ValueChanged<int>? onWeightChanged;
+  final double? weight;
+  final ValueChanged<double>? onWeightChanged;
+  final VoidCallback? onDelete;
 
   const _ExerciseCard({
     super.key,
     required this.exercise,
     required this.onTap,
     required this.onWeightChanged,
+    required this.onDelete,
     required this.weight,
     this.isDraggable = false,
   });
@@ -224,16 +329,25 @@ class _ExerciseCard extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(label(exercise.muscleGroup)),
-        trailing: SizedBox(
-          width: 100,
-          child:  WeightStepper(
-            value: weight ?? 20,
-            onChanged: (v) {
-              if (onWeightChanged != null) {
-                onWeightChanged!(v);
-              }
-            },
-          ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 80,
+              child: WeightInput(
+                value: weight ?? 20,
+                onChanged: (v) {
+                  if (onWeightChanged != null) {
+                    onWeightChanged!(v);
+                  }
+                },
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, color: Colors.red),
+              onPressed: onDelete,
+            ),
+          ],
         ),
       ),
     );
